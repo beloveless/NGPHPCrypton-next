@@ -1,0 +1,46 @@
+    name: NGPHPCrypton
+
+    on:
+     push:
+      branches:
+       - main
+
+    jobs:
+      test:
+        name: Functional Test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+                    uses: actions/checkout@v4
+
+            - name: Create isolated network
+                    run: docker network create --driver bridge isolated      
+
+            - name: Build PHPCrypton Image
+                    run: docker build -t phpcrypton:latest .
+
+            - name: Run PHPCrypton Container
+                    run: docker-compose up -d
+
+            - name: Copy application source code to PHPCrypton container
+                    run: docker cp web2/. docker-apache:/var/www/html
+
+            - name: Obfuscate source code
+                    run: docker exec docker-apache php -r "PHPCrypton::obfuscate('/var/www/html/');"
+
+            - name: Check inside container
+                    run: |
+                            docker exec docker-apache ls -la /var/www/html/
+                            docker exec docker-apache cat /var/www/html/index.php
+
+            - name: Get AUT URL
+                    run: |
+                            URL=http://$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1)
+                            echo "URL=$URL" >> $GITHUB_ENV
+
+            - name: Check AUT URL
+                    run: |
+                            curl -L ${{ env.URL }}
+            
+            - name: stop docker
+                    run: docker stop docker-apache
