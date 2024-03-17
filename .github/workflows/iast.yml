@@ -72,6 +72,11 @@ jobs:
           # -U   specifies which user to select from the context file
           cmd_options: -U "admin" -n badcrud.context
           
+      - name: Download ZAP Scan Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: zap_scan_results
+          
       - name: stop docker
         run: docker stop docker-apache
 
