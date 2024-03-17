@@ -55,12 +55,11 @@ jobs:
       
       - name: Context Setup
         # env:
-        #     # Set a previously defined secret as an environment variable for this step:
-        #     AUTURL: ${{secrets.B64PASSWORD}}
+        # Set a previously defined secret as an environment variable for this step:
         # Replace the "AUTURL" string in the context file with the real base64-encoded password:
         run: |
           sed -ie "s/AUTURL/${{ env.URL }}/" badcrud.context
-        #  cat badcrud.context
+          cat badcrud.context
         
       - name: ZAP Scan
         uses: hermanka/action-full-scan@master
@@ -74,4 +73,3 @@ jobs:
           
       - name: stop docker
         run: docker stop docker-apache
-
