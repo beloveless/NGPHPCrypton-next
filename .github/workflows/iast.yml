@@ -61,7 +61,11 @@ jobs:
         run: |
           sed -ie "s/AUTURL/${{ env.URL }}/" badcrud.context
           cat badcrud.context
-          
+        
+      - name: Download ZAP Scan Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: zap_scan_results
       - name: ZAP Scan
         uses: hermanka/action-full-scan@master
         with:
@@ -71,7 +75,7 @@ jobs:
           # -j   runs the AJAX spider
           # -U   specifies which user to select from the context file
           cmd_options: -U "admin" -n badcrud.context
-          
+
       - name: Download ZAP Scan Artifact
         uses: actions/download-artifact@v2
         with:
